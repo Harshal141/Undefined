@@ -5,7 +5,7 @@ import HeroSection from '../componenets/Herosection';
 
 function TravelApp() {
   return (
-    <main className="overflow-hidden w-full max-w-[1200px] m-auto">
+    <main className="overflow-hidden w-full max-w-[1280px] m-auto">
       <div className="flex flex-wrap gap-5 justify-between w-full max-md:mr-2.5 max-md:max-w-full p-5">
         <Logo />
         <div className="flex gap-10 f-grow align-middle text-xl text-gray-800">
