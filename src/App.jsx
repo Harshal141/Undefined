@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { Route, Routes } from "react-router-dom";
 import './App.css'
 import TravelApp from './pages/Landing'
+import { Builder } from './pages/Builder';
 
 function App() {
 
   return (
     <Routes>
       <Route path="/" element={<TravelApp />} />
+      <Route path="/build" element={<Builder />} />
     </Routes>
   );
 }

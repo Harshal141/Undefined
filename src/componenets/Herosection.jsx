@@ -1,6 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function HeroSection() {
+    const navigate = useNavigate();
+    const goToBuild = () => {
+        navigate('/build');  
+      };
+
   return (
     <section className="flex flex-col items-start pl-1.5 mt-16 w-full font-bold max-md:mt-10 max-md:max-w-full">
       <h1 className="text-lg text-red-400 uppercase max-md:max-w-full">
@@ -15,7 +21,7 @@ function HeroSection() {
         the.
       </p>
       <div className="flex flex-wrap gap-5 justify-between mt-11 max-w-full font-medium w-[504px] max-md:mt-10">
-        <button className="px-9 py-6 text-2xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5">
+        <button onClick={goToBuild} className="px-9 py-6 text-2xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5">
           Plan Iternary
         </button>
         <div className="flex my-auto text-2xl text-zinc-500">
