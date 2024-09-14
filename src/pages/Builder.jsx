@@ -1,9 +1,62 @@
 import React from 'react'
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { ThemeSel } from '../componenets/ThemeSel';
+import Papa from 'papaparse';
+
 
 export const Builder = () => {
-    const [theme,setTheme] = useState(0);
+  const [theme,setTheme] = useState(0);
+  const [firstCity, setFirstCity] = useState('mumbai');
+  const [secondCity, setSecondCity] = useState('pune');
+  const [firstAirportCode, setFirstAirportCode] = useState('');
+  const [secondAirportCode, setSecondAirportCode] = useState('');
+  const [csvData, setCsvData] = useState([]);
+
+  const findAirportCode = (term) => {
+    return csvData.find((entry) =>
+      Object.values(entry).some((field) => 
+        field && field.toLowerCase().includes(term.toLowerCase())
+      )
+    );
+  };
+
+  const findAirportCodes = () => {
+    const firstAirport = findAirportCode(firstCity);
+    const secondAirport = findAirportCode(secondCity);
+
+    if(!firstAirport){
+      alert("Please add a start location with airport nearby, so that we can plan the budget accordingly")
+      return;
+    }
+    if(!secondAirport){
+      alert("Please add a destination location with airport nearby, so that we can plan the budget accordingly")
+      return;
+    }
+
+    setFirstAirportCode(firstAirport.code);
+    setSecondAirportCode(secondAirport.code);
+  };
+
+  useEffect(() => {
+    const fetchCSV = async () => {
+      const response = await fetch('/airports.csv');
+      const csvText = await response.text();
+
+      Papa.parse(csvText, {
+        header: true,
+        complete: (result) => {
+          setCsvData(result.data);
+        },
+        error: (error) => {
+          console.error('Error parsing CSV: ', error);
+        },
+      });
+    };
+
+    fetchCSV();
+  }, []);
+
+    
   return (
     <div className="w-full">
       <ThemeSel />
@@ -16,8 +69,8 @@ export const Builder = () => {
         </h1>
       </div>
       <br />
-      <div className="flex flex-wrap mb-10 max-w-[1200px] m-auto">
-        <form className="max-w-md mx-auto my-2">
+      <form className="flex flex-wrap mb-10 max-w-[1200px] m-auto">
+        <div className="max-w-md mx-auto my-2">
           <div className="relative z-0 w-full mb-5 group">
             <input
               type="text"
@@ -68,11 +121,12 @@ export const Builder = () => {
                 type="date"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
                 placeholder="Select date"
+                required
               />
             </div>
           </div>
-        </form>
-        <form className="max-w-md mx-auto my-2">
+        </div>
+        <div className="max-w-md mx-auto my-2">
           <div className="relative z-0 w-full mb-5 group">
             <input
               type="text"
@@ -133,10 +187,15 @@ export const Builder = () => {
               </span>
             </label>
           </div>
-        </form>
-      </div>
+        </div>
+        <button onClick={findAirportCodes}>Find Airport Codes</button>
+          {firstAirportCode && <p>First City Airport Code: {firstAirportCode}</p>}
+          <br />
+          {secondAirportCode && <p>Second City Airport Code: {secondAirportCode}</p>}
+      </form>
       <br />
       <br />
+      
     </div>
   );
 }
