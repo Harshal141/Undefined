@@ -4,6 +4,7 @@ import { ThemeSel } from '../componenets/ThemeSel';
 import Papa from 'papaparse';
 import axios from 'axios';
 import getAccessToken from '../services/Auth';
+import configCreater from '../services/Helper';
 
 export const Builder = () => {
   const [theme, setTheme] = useState(0);
@@ -29,31 +30,21 @@ export const Builder = () => {
   const fetchFlightOffers = async (firstAirportCode, secondAirportCode, startDate) => {
     const key = await getAccessToken();
     
-    const getFlightsConfig = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: `https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=${firstAirportCode}&destinationLocationCode=${secondAirportCode}&departureDate=${startDate}&adults=${crowd}&nonStop=false&max=5`,
-      headers: {
-        'Content-Type': 'application/json', 
-        'Authorization': `Bearer ${key}`
-      }
-    };
-    // const getHotelsConfig = {
-    //   method: 'get',
-    //   url: 'https://test.api.amadeus.com/v2/reference-data/locations/hotels/by-city',
-    //   headers: {
-    //     'Authorization': `Bearer ${key}`,  },
-    //   params: {
-    //     cityCode: secondAirportCode, 
-    //     radius: "20"
-    //   }
-    // };
-  
+    const getFlightsConfig = configCreater(`v2/shopping/flight-offers?originLocationCode=${firstAirportCode}&destinationLocationCode=${secondAirportCode}&departureDate=${startDate}&adults=${crowd}&nonStop=false&max=5`, key);
+    const getHotelsConfig = configCreater(`v1/reference-data/locations/hotels/by-city?cityCode=${secondAirportCode}&radius=20&radiusUnit=KM&hotelSource=ALL`,key);
+
     try {
       const flights = await axios.request(getFlightsConfig);
-      // const hotels = await axios.request(getHotelsConfig);
+      const hotels = await axios.request(getHotelsConfig);
 
-      console.log(JSON.stringify(flights.data));
+      const topFive = hotels.data.data.slice(0, 5).map(hotel => hotel.hotelId).join(',');
+
+      const getPriceConfig = configCreater(`v3/shopping/hotel-offers?hotelIds=${topFive}&adults=${crowd}&checkInDate=${startDate}&roomQuantity=1&paymentPolicy=NONE&bestRateOnly=true`,key);
+
+      const hotelPrice = await axios.request(getPriceConfig);
+
+      console.log(hotelPrice.data);
+      console.log(topFive)
     } catch (error) {
       console.error(error);
     }
