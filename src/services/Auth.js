@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 let accessToken = null;
+let tokenExpiry = null;
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 const API_SECRET = import.meta.env.VITE_API_SECRET;
@@ -24,6 +25,7 @@ const getAccessToken = async () => {
     );
 
     accessToken = response.data.access_token;
+    tokenExpiry = Date.now() + response.data.expires_in * 1000;
     return accessToken;
   } catch (error) {
     console.error('Error fetching access token:', error);

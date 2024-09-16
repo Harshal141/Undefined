@@ -27,9 +27,9 @@ export const Builder = () => {
   };
 
   const fetchFlightOffers = async (firstAirportCode, secondAirportCode, startDate) => {
-    // const key = await getAccessToken();
-    const key = import.meta.env.VITE_TEMP // remove on prod
-    const config = {
+    const key = await getAccessToken();
+    
+    const getFlightsConfig = {
       method: 'get',
       maxBodyLength: Infinity,
       url: `https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=${firstAirportCode}&destinationLocationCode=${secondAirportCode}&departureDate=${startDate}&adults=${crowd}&nonStop=false&max=5`,
@@ -38,10 +38,22 @@ export const Builder = () => {
         'Authorization': `Bearer ${key}`
       }
     };
+    // const getHotelsConfig = {
+    //   method: 'get',
+    //   url: 'https://test.api.amadeus.com/v2/reference-data/locations/hotels/by-city',
+    //   headers: {
+    //     'Authorization': `Bearer ${key}`,  },
+    //   params: {
+    //     cityCode: secondAirportCode, 
+    //     radius: "20"
+    //   }
+    // };
   
     try {
-      const response = await axios.request(config);
-      console.log(JSON.stringify(response.data));
+      const flights = await axios.request(getFlightsConfig);
+      // const hotels = await axios.request(getHotelsConfig);
+
+      console.log(JSON.stringify(flights.data));
     } catch (error) {
       console.error(error);
     }
