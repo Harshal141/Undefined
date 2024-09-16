@@ -8,7 +8,7 @@ function HeroSection() {
       };
 
   return (
-    <section className="flex flex-col items-start pl-1.5 mt-16 w-full font-bold max-md:mt-10 max-md:max-w-full">
+    <section className="flex flex-col items-start pl-1.5 mt-12 w-full font-bold max-md:mt-10 max-md:max-w-full">
       <h1 className="text-lg text-red-400 uppercase max-md:max-w-full">
         Best Destinations around the world
       </h1>
@@ -16,9 +16,7 @@ function HeroSection() {
         Travel, enjoy <br /> and live a new <br /> and full life
       </p>
       <p className="mt-6 text-base font-medium leading-8 text-gray-500">
-        Built Wicket longer admire do barton vanity itself do in it. Preferred
-        to sportsmen it engrossed listening. Park gate sell they west hard for
-        the.
+      Plan your perfect trip with our AI-powered itinerary planner—tailored to your preferences, budget, and travel goals. Effortlessly create personalized travel plans and discover new experiences.
       </p>
       <div className="flex flex-wrap gap-5 justify-between mt-11 max-w-full font-medium w-[504px] max-md:mt-10">
         <button onClick={goToBuild} className="px-9 py-6 text-2xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5">

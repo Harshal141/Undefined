@@ -5,6 +5,7 @@ import Papa from 'papaparse';
 import axios from 'axios';
 import getAccessToken from '../services/Auth';
 import configCreater from '../services/Helper';
+import { Navbar } from '../componenets/Navbar';
 
 export const Builder = () => {
   const [theme, setTheme] = useState(0);
@@ -90,6 +91,7 @@ export const Builder = () => {
 
   return (
     <div className="w-full">
+    <Navbar/>
       <ThemeSel />
       <br />
       <div className="w-full p-4 flex flex-col items-center">
