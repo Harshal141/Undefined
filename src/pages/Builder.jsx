@@ -45,7 +45,7 @@ export const Builder = () => {
       console.log(topFive)
 
       const getPriceConfig = configCreater(`v3/shopping/hotel-offers?hotelIds=${topFive}&adults=${crowd}&checkInDate=${startDate}&roomQuantity=1&paymentPolicy=NONE&bestRateOnly=true`,key);
-      const getActivityConfig = configCreater(`v1/shopping/activities?latitude=${secondAirport.latitude}&longitude=${secondAirport.longitude}&radius=20`,key);
+      const getActivityConfig = configCreater(`v1/shopping/activities?latitude=${secondAirport.latitude}&longitude=${secondAirport.longitude}&radius=20&categories=SIGHTS,NIGHTLIFE,RESTAURANT,SHOPPING`,key);
 
       const hotelPrice = await axios.request(getPriceConfig);
       console.log(hotelPrice.data);
@@ -101,14 +101,16 @@ export const Builder = () => {
       case 1: return(
         <div>
             <ThemeSel />
+            <br />
             <div className="max-w-md mx-auto my-2 flex justify-center">
               <button
                 onClick={() => setStep(2)}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+                className="px-7 py-4 text-xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5"
               >
                 Next
               </button>
             </div>
+            <br />
           </div>
       )
       case 2: return (
@@ -254,13 +256,13 @@ export const Builder = () => {
           <div className="max-w-md mx-auto my-2 flex justify-between">
             <button
               onClick={() => setStep(1)}
-              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
+              className="px-7 py-4 text-xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5"
             >
               Back
             </button>
             <button
               onClick={findAirportCodes}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+              className="px-7 py-4 text-xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5"
             >
               Submit
             </button>
@@ -272,7 +274,7 @@ export const Builder = () => {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-[1280px] m-auto">
     <Navbar/>
       {renderStep()}
     </div>
