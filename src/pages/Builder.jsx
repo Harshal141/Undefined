@@ -1,16 +1,22 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
-import { ThemeSel } from '../componenets/ThemeSel';
+import ThemeSel from '../componenets/ThemeSel';
 import Papa from 'papaparse';
 import axios from 'axios';
 import getAccessToken from '../services/Auth';
 import configCreater from '../services/Helper';
 import { Navbar } from '../componenets/Navbar';
+import generateContent from '../services/Gemini';
 
 export const Builder = () => {
   const [step, setStep] = useState(1);
 
-  const [theme, setTheme] = useState(0);
+  const [selectedTitles, setSelectedTitles] = useState([]);
+
+  const handleSelectionChange = (titles) => {
+    setSelectedTitles(titles);
+  };
+
   const [firstCity, setFirstCity] = useState('pune');
   const [secondCity, setSecondCity] = useState('mumbai');
   const [firstAirportCode, setFirstAirportCode] = useState('');
@@ -52,6 +58,10 @@ export const Builder = () => {
       const activity = await axios.request(getActivityConfig);
       console.log("first")
       console.log(activity);
+
+      const prompt = `Generate a personalized travel itinerary for a trip to ${JSON.stringify(secondCity)} with a budget of ${budget} Rs. The traveler is interested in ${JSON.stringify(selectedTitles)}. They have the flight details ${JSON.stringify(flights.data.data)} and the accomadations is available at ${JSON.stringify(hotelPrice.data)} . The itinerary should include Outdoor activities and Traditional dining options. Please provide a detailed itinerary with daily recommendations for ${duration} days, including these activities ${JSON.stringify(activity.data.data)} described in a JSON format. The itinerary should be written in English. Give me the ouput in md format and also scrape the longitude and latitude of any place you are mentioning and send it in an array at the end, eg:[{longitude:1,latitude:1},{longitude:2,latitude:2}]. Also give me the detail if the flights i should chose and the hotel i got the best deal in.`;
+      const content = await generateContent(prompt);
+      console.log(content.data.candidates[0].content.parts[0].text);
       
     } catch (error) {
       console.error(error);
@@ -100,7 +110,7 @@ export const Builder = () => {
     switch(step){
       case 1: return(
         <div>
-            <ThemeSel />
+            <ThemeSel onSelectionChange={handleSelectionChange}/>
             <br />
             <div className="max-w-md mx-auto my-2 flex justify-center">
               <button
