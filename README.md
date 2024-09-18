@@ -9,10 +9,11 @@ This project is an AI-powered travel planner that generates personalized travel 
 - AI Recommendations: Powered by Gemini AI for smart suggestions on destinations, activities, and accommodations.
 
 ## Tech Stack
-Frontend: React (Vite)
-Styling: Tailwind CSS
-AI: Gemini AI
-APIs: Amadeus API for flight and hotel details
+- Frontend: React (Vite)
+- Styling: Tailwind CSS
+- AI: Gemini AI
+- APIs: Amadeus API for flight and hotel details
+- Libraries: Axios, React-markdown
 
 ## Installation
 
@@ -39,15 +40,17 @@ npm install
 ```
 Set up environment variables: Create a .env file in the root directory with the following variables:
 
+```
 VITE_API_KEY=amadeus-apikey
 VITE_API_SECRET=amadeus-apikey-secret
 VITE_GEMINI_KEY=your-gemini-api-key
+```
 
 > [!NOTE]  
 > To create a amadeus api key visit: https://developers.amadeus.com/
 > For Gemini api key: https://aistudio.google.com/app/apikey
 
-Run the development server: If using Yarn:
+Run the development server:
 
 ```
 yarn dev
