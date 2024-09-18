@@ -1,29 +1,26 @@
 import React from 'react'
 import axios from 'axios';
 import Papa from 'papaparse';
+import Markdown from 'react-markdown';
 import { useState, useEffect } from 'react';
 import ThemeSel from '../componenets/ThemeSel';
 import { Navbar } from '../componenets/Navbar';
 import getAccessToken from '../services/Auth';
 import configCreater from '../services/Helper';
 import generateContent from '../services/Gemini';
-import Markdown from 'react-markdown';
 
 export const Builder = () => {
   const [step, setStep] = useState(1);
-
   const [selectedTitles, setSelectedTitles] = useState([]);
 
   const handleSelectionChange = (titles) => {
     setSelectedTitles(titles);
   };
 
-  const [firstCity, setFirstCity] = useState('pune');
-  const [secondCity, setSecondCity] = useState('mumbai');
-  const [firstAirportCode, setFirstAirportCode] = useState('');
-  const [secondAirportCode, setSecondAirportCode] = useState('');
+  const [firstCity, setFirstCity] = useState('');
+  const [secondCity, setSecondCity] = useState('');
   const [budget, setBudget] = useState('');
-  const [duration, setDuration] = useState('');
+  const [duration, setDuration] = useState('1');
   const [exploreToggle, setExploreToggle] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [crowd, setCrowd] = useState(1);
@@ -45,6 +42,8 @@ export const Builder = () => {
     const getHotelsConfig = configCreater(`v1/reference-data/locations/hotels/by-city?cityCode=${secondAirport.code}&radius=20&radiusUnit=KM&hotelSource=ALL`,key);
 
     try {
+
+      // Fetch api calls to get realtime data related to travel
       setLoadIternary("Fetching flight details");
       const flights = await axios.request(getFlightsConfig);
 
@@ -67,6 +66,7 @@ export const Builder = () => {
       const content = await generateContent(prompt);
       console.log(content.data.candidates[0].content.parts[0].text);
 
+      // set content for visual
       setContent(content.data.candidates[0].content.parts[0].text)
       setLoadIternary(false);
       setStep(3);
@@ -88,9 +88,6 @@ export const Builder = () => {
       alert("Please add a destination location with airport nearby, so that we can plan the budget accordingly");
       return;
     }
-
-    setFirstAirportCode(firstAirport.code);
-    setSecondAirportCode(secondAirport.code);
 
     fetchFlightOffers(firstAirport, secondAirport, startDate);
   };
@@ -115,10 +112,11 @@ export const Builder = () => {
   }, []);
 
   const renderStep = () =>{
-    switch(step){
-      case 1: return(
-        <div>
-            <ThemeSel onSelectionChange={handleSelectionChange}/>
+    switch (step) {
+      case 1:
+        return (
+          <div>
+            <ThemeSel onSelectionChange={handleSelectionChange} />
             <br />
             <div className="max-w-md mx-auto my-2 flex justify-center">
               <button
@@ -130,177 +128,178 @@ export const Builder = () => {
             </div>
             <br />
           </div>
-      )
-      case 2: return (
-        <>
-          <div className="w-full p-4 flex flex-col items-center">
-            <p className="text-[#5E6282] text-base">DESTINATION</p>
+        );
+      case 2:
+        return (
+          <form>
+            <div className="w-full p-4 flex flex-col items-center">
+              <p className="text-[#5E6282] text-base">DESTINATION</p>
 
-            <h1 className="text-4xl text-indigo-950">
-              Just a few more details before we plan
-            </h1>
-          </div>
-          <br />
-          <form className="flex flex-wrap mb-10 max-w-[1200px] m-auto">
-            <div className="max-w-md mx-auto my-2">
-              <div className="relative z-0 w-full mb-5 group">
-                <input
-                  type="text"
-                  name="start_location"
-                  id="start_location"
-                  className="block min-w-[300px] py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  required
-                  value={firstCity}
-                  onChange={(e) => setFirstCity(e.target.value)}
-                />
-                <label
-                  htmlFor="start_location"
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                >
-                  Start Location (City)
-                </label>
+              <h1 className="text-4xl text-indigo-950">
+                Just a few more details before we plan
+              </h1>
+            </div>
+            <br />
+            <div className="flex flex-wrap mb-10 max-w-[1200px] m-auto">
+              <div className="max-w-md mx-auto my-2">
+                <div className="relative z-0 w-full mb-5 group">
+                  <input
+                    type="text"
+                    name="start_location"
+                    id="start_location"
+                    className="block min-w-[300px] py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                    placeholder=" "
+                    required
+                    value={firstCity}
+                    onChange={(e) => setFirstCity(e.target.value)}
+                  />
+                  <label
+                    htmlFor="start_location"
+                    className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                  >
+                    Start Location (City)
+                  </label>
+                </div>
+
+                <div className="relative z-0 w-full mb-5 group">
+                  <input
+                    type="number"
+                    name="budget"
+                    id="budget"
+                    className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                    placeholder=" "
+                    required
+                    value={budget}
+                    onChange={(e) => setBudget(e.target.value)}
+                  />
+                  <label
+                    htmlFor="budget"
+                    className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                  >
+                    Enter Budget
+                  </label>
+                </div>
+
+                <div className="relative z-0 w-full mt-8 mb-5 group">
+                  <input
+                    id="default-datepicker"
+                    type="date"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
+                    placeholder="Select date"
+                    required
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
+                </div>
               </div>
 
-              <div className="relative z-0 w-full mb-5 group">
-                <input
-                  type="number"
-                  name="budget"
-                  id="budget"
-                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  required
-                  value={budget}
-                  onChange={(e) => setBudget(e.target.value)}
-                />
-                <label
-                  htmlFor="budget"
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                >
-                  Enter Budget
-                </label>
-              </div>
+              <div className="max-w-md mx-auto my-2">
+                <div className="relative z-0 w-full mb-5 group">
+                  <input
+                    type="text"
+                    name="end_location"
+                    id="end_location"
+                    className="block min-w-[300px] py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                    placeholder=" "
+                    required
+                    value={secondCity}
+                    onChange={(e) => setSecondCity(e.target.value)}
+                  />
+                  <label
+                    htmlFor="end_location"
+                    className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                  >
+                    Destination (City)
+                  </label>
+                </div>
 
-              <div className="relative z-0 w-full mt-8 mb-5 group">
-                <input
-                  id="default-datepicker"
-                  type="date"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
-                  placeholder="Select date"
-                  required
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
+                <div className="grid md:grid-cols-2 md:gap-6">
+                  <div className="relative z-0 w-full mb-5 group">
+                    <input
+                      type="number"
+                      name="duration"
+                      id="duration"
+                      className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                      placeholder=" "
+                      required
+                      value={duration}
+                      onChange={(e) => setDuration(e.target.value)}
+                    />
+                    <label
+                      htmlFor="duration"
+                      className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >
+                      Duration (Days)
+                    </label>
+                  </div>
+
+                  <div className="relative z-0 w-full mb-5 group">
+                    <input
+                      type="number"
+                      name="crowd"
+                      id="crowd"
+                      className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                      placeholder=" "
+                      value={crowd}
+                      required
+                      onChange={(e) => setCrowd(e.target.value)}
+                    />
+                    <label
+                      htmlFor="crowd"
+                      className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >
+                      No of people
+                    </label>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <label className="inline-flex items-center cursor-pointer w-full">
+                    <input
+                      type="checkbox"
+                      value=""
+                      className="sr-only peer"
+                      checked={exploreToggle}
+                      onChange={(e) => setExploreToggle(e.target.checked)}
+                    />
+                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:bg-blue-600 peer-checked:after:translate-x-full after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                    <span className="ml-3 text-sm font-medium text-gray-900">
+                      Explore Location
+                    </span>
+                  </label>
+                </div>
               </div>
             </div>
-
-            <div className="max-w-md mx-auto my-2">
-              <div className="relative z-0 w-full mb-5 group">
-                <input
-                  type="text"
-                  name="end_location"
-                  id="end_location"
-                  className="block min-w-[300px] py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  required
-                  value={secondCity}
-                  onChange={(e) => setSecondCity(e.target.value)}
-                />
-                <label
-                  htmlFor="end_location"
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                >
-                  Destination (City)
-                </label>
-              </div>
-
-              <div className="grid md:grid-cols-2 md:gap-6">
-                <div className="relative z-0 w-full mb-5 group">
-                  <input
-                    type="number"
-                    name="duration"
-                    id="duration"
-                    className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                    placeholder=" "
-                    required
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                  />
-                  <label
-                    htmlFor="duration"
-                    className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                  >
-                    Duration (Days)
-                  </label>
-                </div>
-
-                <div className="relative z-0 w-full mb-5 group">
-                  <input
-                    type="number"
-                    name="crowd"
-                    id="crowd"
-                    className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                    placeholder=" "
-                    value={crowd}
-                    required
-                    onChange={(e) => setCrowd(e.target.value)}
-                  />
-                  <label
-                    htmlFor="crowd"
-                    className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                  >
-                    No of people
-                  </label>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label className="inline-flex items-center cursor-pointer w-full">
-                  <input
-                    type="checkbox"
-                    value=""
-                    className="sr-only peer"
-                    checked={exploreToggle}
-                    onChange={(e) => setExploreToggle(e.target.checked)}
-                  />
-                  <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:bg-blue-600 peer-checked:after:translate-x-full after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                  <span className="ml-3 text-sm font-medium text-gray-900">
-                    Explore Location
-                  </span>
-                </label>
-              </div>
+            <div className="max-w-md mx-auto my-2 flex justify-between">
+              <button
+                onClick={() => setStep(1)}
+                className="px-7 py-4 text-xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5"
+              >
+                Back
+              </button>
+              <button
+                onSubmit={findAirportCodes}
+                className="px-7 py-4 text-xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5"
+              >
+                Submit
+              </button>
             </div>
           </form>
-          <div className="max-w-md mx-auto my-2 flex justify-between">
-            <button
-              onClick={() => setStep(1)}
-              className="px-7 py-4 text-xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5"
-            >
-              Back
-            </button>
-            <button
-              onClick={findAirportCodes}
-              className="px-7 py-4 text-xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5"
-            >
-              Submit
-            </button>
+        );
+      case 3:
+        return (
+          <div className="w-full p-4 m-5">
+            <center>
+              <p className="text-[#5E6282] text-base">ITERNARY</p>
+              <h1 className="text-4xl text-indigo-950">
+                A Theme Planned Based On Your Liking
+              </h1>
+            </center>
+            <br />
+            <br />
+            <Markdown>{content}</Markdown>
           </div>
-        </>
-      )
-      case 3: return (
-        <div className="w-full p-4 m-5">
-          <center>
-            <p className="text-[#5E6282] text-base">ITERNARY</p>
-            <h1 className="text-4xl text-indigo-950">
-              A Theme Planned Based On Your Liking
-            </h1>
-          </center>
-          <br />
-          <br />
-          <Markdown>{content}</Markdown>
-        </div>
-      );
-      
+        );
     }
   }
 

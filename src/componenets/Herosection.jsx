@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Pause from '../assets/images/pb.png'
 
 function HeroSection() {
-    const navigate = useNavigate();
-    const goToBuild = () => {
-        navigate('/build');  
-      };
+  
+  const navigate = useNavigate();
+  const goToBuild = () => {
+    navigate("/build");
+  };
 
   return (
     <section className="flex flex-col items-start pl-1.5 mt-12 w-full font-bold max-md:mt-10 max-md:max-w-full">
@@ -30,7 +32,7 @@ function HeroSection() {
         <div className="flex my-auto text-2xl text-zinc-500">
           <img
             loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/914ec729ab347f1ca0b1e7099aec998580b0401b526b0f5895659abd6e6311f6?placeholderIfAbsent=true&apiKey=39abe5058c20493bb239609f2bdddfc1"
+            src={Pause}
             alt=""
             className="object-contain shrink-0 aspect-square w-[69px] mb-[-20px]"
           />

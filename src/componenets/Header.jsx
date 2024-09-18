@@ -1,5 +1,4 @@
 import React from 'react';
-import Logo from './Logo';
 import Her from '../assets/images/heroimg.png';
 
 function Header() {

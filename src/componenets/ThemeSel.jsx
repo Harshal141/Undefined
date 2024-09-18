@@ -33,7 +33,7 @@ const ThemeSel = ({ onSelectionChange }) => {
         <h1 className="text-4xl text-indigo-950">
           What Motivates You For This Journey
         </h1>
-        <div className='mt-10 max-w-[1000px] flex flex-wrap align-middle justify-center gap-6 '>
+        <div className="mt-10 max-w-[1000px] flex flex-wrap align-middle justify-center gap-6 ">
           {cardsData.map((card, index) => (
             <ThemeCard
               key={index}

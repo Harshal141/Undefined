@@ -7,10 +7,11 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 const API_SECRET = import.meta.env.VITE_API_SECRET;
 
 const getAccessToken = async () => {
+
+  // Generate auth token only if previous is expired
   if (accessToken && tokenExpiry > Date.now()) {
     return accessToken;
   }
-
   try {
     const response = await axios.post(
       'https://test.api.amadeus.com/v1/security/oauth2/token',

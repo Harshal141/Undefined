@@ -2,9 +2,12 @@ import React from 'react';
 
 const ThemeCard = ({ title, imageUrl, isActive, onClick }) => {
   return (
+    // Toggle active cards by changing theme
     <div
       className={`relative grid h-[15rem] w-64 flex-col items-end justify-center overflow-hidden rounded-lg cursor-pointer ${
-        isActive ? 'border-4 border-blue-400 shadow-2xl' : 'border border-transparent'
+        isActive
+          ? "border-4 border-blue-400 shadow-2xl"
+          : "border border-transparent"
       }`}
       onClick={onClick}
     >
