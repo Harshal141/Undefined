@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ThemeCard from './ThemeCard';
 import { cardsData } from '../assets/Data';
+import { Heading } from './Heading';
 
 const ThemeSel = ({ onSelectionChange }) => {
   const [activeCardIndices, setActiveCardIndices] = useState([]);
@@ -28,11 +29,8 @@ const ThemeSel = ({ onSelectionChange }) => {
   return (
     <div className="w-full items-center">
       <center>
-        <p className="text-[#5E6282] text-base">THEME</p>
+        <Heading header="THEME" slogan="What Motivates You For This Journey" />
 
-        <h1 className="text-4xl text-indigo-950">
-          What Motivates You For This Journey
-        </h1>
         <div className="mt-10 max-w-[1000px] flex flex-wrap align-middle justify-center gap-6 ">
           {cardsData.map((card, index) => (
             <ThemeCard
