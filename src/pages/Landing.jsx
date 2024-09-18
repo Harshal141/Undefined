@@ -6,7 +6,7 @@ import { Navbar } from '../componenets/Navbar';
 function TravelApp() {
   return (
     <main className="overflow-hidden w-full max-w-[1280px] m-auto">
-      <Navbar/>
+      <Navbar />
       <div className="flex gap-5 max-md:flex-col">
         <div className="flex flex-col md:w-1/2 w-full p-8 h-fit ">
           <div className="flex flex-col w-full max-md:mt-10 max-md:max-w-full">

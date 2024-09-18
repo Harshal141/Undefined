@@ -7,6 +7,7 @@ import { Navbar } from '../componenets/Navbar';
 import getAccessToken from '../services/Auth';
 import configCreater from '../services/Helper';
 import generateContent from '../services/Gemini';
+import Markdown from 'react-markdown';
 
 export const Builder = () => {
   const [step, setStep] = useState(1);
@@ -62,33 +63,18 @@ export const Builder = () => {
       const activity = await axios.request(getActivityConfig);
 
       setLoadIternary("Generating AI planned Iternary");
-      const prompt = `Generate a personalized travel itinerary for a trip to ${JSON.stringify(secondCity)} with a budget of ${budget} Rs. The traveler is interested in ${JSON.stringify(selectedTitles)}. They have the flight details ${JSON.stringify(flights.data.data)} and the accomadations is available at ${JSON.stringify(hotelPrice.data)}. Please provide a detailed itinerary with daily recommendations for ${duration} days, including these activities ${JSON.stringify(activity.data.data)} . The itinerary should be written in English. Give me the ouput in md format and also scrape the longitude and latitude of any place you are mentioning and send it in an array at the end (eg:[{longitude:1,latitude:1},{longitude:2,latitude:2}] strictly follow this format no spaces). Also give me the details of flights i should chose and the hotel we got the best deals in.`;
+      const prompt = `Generate a personalized travel itinerary for a trip to ${JSON.stringify(secondCity)} with a budget of ${budget} Rs. The traveler is interested in ${JSON.stringify(selectedTitles)}. They have the flight details ${JSON.stringify(flights.data.data)} and the accomadations is available at ${JSON.stringify(hotelPrice.data)}. Please provide a detailed itinerary with daily recommendations for ${duration} days, including these activities ${JSON.stringify(activity.data.data)} . The itinerary should be written in English. Give me the ouput in md format. Also give me the details of flights i should chose and the hotel we got the best deals from the gives list of flights and hotels.`;
       const content = await generateContent(prompt);
-      setContent(content.data.candidates[0].content.parts[0].text);
       console.log(content.data.candidates[0].content.parts[0].text);
 
+      setContent(content.data.candidates[0].content.parts[0].text)
       setLoadIternary(false);
       setStep(3);
-      
-      filterContent(content.data.candidates[0].content.parts[0].text);
+
     } catch (error) {
       console.error(error);
     }
   };
-
-  const filterContent = (content) =>{
-    const coordinateRegex = /\{\s*"longitude":\s*(\d+(\.\d+)?)\s*,\s*"latitude":\s*(\d+(\.\d+)?)\s*\}(,|\n)?/g;
-
-    let coords = [];
-    
-    const cleanedData = content.replace(coordinateRegex, (match, longitude, _, latitude) => {
-      coords.push({ longitude: parseFloat(longitude), latitude: parseFloat(latitude) });
-      return '';
-    });
-
-    console.log(cleanedData)
-    console.log(coords)
-  }
 
   const findAirportCodes = () => {
     const firstAirport = findAirportCode(firstCity);
@@ -301,11 +287,19 @@ export const Builder = () => {
           </div>
         </>
       )
-      case 3: return(
-        <>
-          {JSON.stringify(content)}
-        </>
-      )
+      case 3: return (
+        <div className="w-full p-4 m-5">
+          <center>
+            <p className="text-[#5E6282] text-base">ITERNARY</p>
+            <h1 className="text-4xl text-indigo-950">
+              A Theme Planned Based On Your Liking
+            </h1>
+          </center>
+          <br />
+          <br />
+          <Markdown>{content}</Markdown>
+        </div>
+      );
       
     }
   }

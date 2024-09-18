@@ -16,10 +16,15 @@ function HeroSection() {
         Travel, enjoy <br /> and live a new <br /> and full life
       </p>
       <p className="mt-6 text-base font-medium leading-8 text-gray-500">
-      Plan your perfect trip with our AI-powered itinerary planner—tailored to your preferences, budget, and travel goals. Effortlessly create personalized travel plans and discover new experiences.
+        Plan your perfect trip with our AI-powered itinerary planner—tailored to
+        your preferences, budget, and travel goals. Effortlessly create
+        personalized travel plans and discover new experiences.
       </p>
       <div className="flex flex-wrap gap-5 justify-between mt-11 max-w-full font-medium w-[504px] max-md:mt-10">
-        <button onClick={goToBuild} className="px-9 py-6 text-2xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5">
+        <button
+          onClick={goToBuild}
+          className="px-9 py-6 text-2xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5"
+        >
           Plan Iternary
         </button>
         <div className="flex my-auto text-2xl text-zinc-500">
