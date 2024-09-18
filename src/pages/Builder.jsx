@@ -1,11 +1,11 @@
 import React from 'react'
+import axios from 'axios';
+import Papa from 'papaparse';
 import { useState, useEffect } from 'react';
 import ThemeSel from '../componenets/ThemeSel';
-import Papa from 'papaparse';
-import axios from 'axios';
+import { Navbar } from '../componenets/Navbar';
 import getAccessToken from '../services/Auth';
 import configCreater from '../services/Helper';
-import { Navbar } from '../componenets/Navbar';
 import generateContent from '../services/Gemini';
 
 export const Builder = () => {
@@ -27,6 +27,8 @@ export const Builder = () => {
   const [startDate, setStartDate] = useState('');
   const [crowd, setCrowd] = useState(1);
   const [csvData, setCsvData] = useState([]);
+  const [content, setContent] = useState('');
+  const [loadIternary, setLoadIternary] = useState(false);
 
   const findAirportCode = (term) => {
     return csvData.find((entry) =>
@@ -38,35 +40,55 @@ export const Builder = () => {
 
   const fetchFlightOffers = async (firstAirport, secondAirport, startDate) => {
     const key = await getAccessToken();
-    
     const getFlightsConfig = configCreater(`v2/shopping/flight-offers?originLocationCode=${firstAirport.code}&destinationLocationCode=${secondAirport.code}&departureDate=${startDate}&adults=${crowd}&nonStop=false&max=5`, key);
     const getHotelsConfig = configCreater(`v1/reference-data/locations/hotels/by-city?cityCode=${secondAirport.code}&radius=20&radiusUnit=KM&hotelSource=ALL`,key);
 
     try {
+      setLoadIternary("Fetching flight details");
       const flights = await axios.request(getFlightsConfig);
-      console.log(flights)
+
+      setLoadIternary("Checking available hotels");
       const hotels = await axios.request(getHotelsConfig);
-      console.log(hotels)
+
       const topFive = hotels.data.data.slice(0, 5).map(hotel => hotel.hotelId).join(',');
-      console.log(topFive)
 
       const getPriceConfig = configCreater(`v3/shopping/hotel-offers?hotelIds=${topFive}&adults=${crowd}&checkInDate=${startDate}&roomQuantity=1&paymentPolicy=NONE&bestRateOnly=true`,key);
       const getActivityConfig = configCreater(`v1/shopping/activities?latitude=${secondAirport.latitude}&longitude=${secondAirport.longitude}&radius=20&categories=SIGHTS,NIGHTLIFE,RESTAURANT,SHOPPING`,key);
 
+      setLoadIternary("Comparing prices");
       const hotelPrice = await axios.request(getPriceConfig);
-      console.log(hotelPrice.data);
-      const activity = await axios.request(getActivityConfig);
-      console.log("first")
-      console.log(activity);
-
-      const prompt = `Generate a personalized travel itinerary for a trip to ${JSON.stringify(secondCity)} with a budget of ${budget} Rs. The traveler is interested in ${JSON.stringify(selectedTitles)}. They have the flight details ${JSON.stringify(flights.data.data)} and the accomadations is available at ${JSON.stringify(hotelPrice.data)} . The itinerary should include Outdoor activities and Traditional dining options. Please provide a detailed itinerary with daily recommendations for ${duration} days, including these activities ${JSON.stringify(activity.data.data)} described in a JSON format. The itinerary should be written in English. Give me the ouput in md format and also scrape the longitude and latitude of any place you are mentioning and send it in an array at the end, eg:[{longitude:1,latitude:1},{longitude:2,latitude:2}]. Also give me the detail if the flights i should chose and the hotel i got the best deal in.`;
-      const content = await generateContent(prompt);
-      console.log(content.data.candidates[0].content.parts[0].text);
       
+      setLoadIternary("Searching attractions and activities");
+      const activity = await axios.request(getActivityConfig);
+
+      setLoadIternary("Generating AI planned Iternary");
+      const prompt = `Generate a personalized travel itinerary for a trip to ${JSON.stringify(secondCity)} with a budget of ${budget} Rs. The traveler is interested in ${JSON.stringify(selectedTitles)}. They have the flight details ${JSON.stringify(flights.data.data)} and the accomadations is available at ${JSON.stringify(hotelPrice.data)}. Please provide a detailed itinerary with daily recommendations for ${duration} days, including these activities ${JSON.stringify(activity.data.data)} . The itinerary should be written in English. Give me the ouput in md format and also scrape the longitude and latitude of any place you are mentioning and send it in an array at the end (eg:[{longitude:1,latitude:1},{longitude:2,latitude:2}] strictly follow this format no spaces). Also give me the details of flights i should chose and the hotel we got the best deals in.`;
+      const content = await generateContent(prompt);
+      setContent(content.data.candidates[0].content.parts[0].text);
+      console.log(content.data.candidates[0].content.parts[0].text);
+
+      setLoadIternary(false);
+      setStep(3);
+      
+      filterContent(content.data.candidates[0].content.parts[0].text);
     } catch (error) {
       console.error(error);
     }
   };
+
+  const filterContent = (content) =>{
+    const coordinateRegex = /\{\s*"longitude":\s*(\d+(\.\d+)?)\s*,\s*"latitude":\s*(\d+(\.\d+)?)\s*\}(,|\n)?/g;
+
+    let coords = [];
+    
+    const cleanedData = content.replace(coordinateRegex, (match, longitude, _, latitude) => {
+      coords.push({ longitude: parseFloat(longitude), latitude: parseFloat(latitude) });
+      return '';
+    });
+
+    console.log(cleanedData)
+    console.log(coords)
+  }
 
   const findAirportCodes = () => {
     const firstAirport = findAirportCode(firstCity);
@@ -278,14 +300,45 @@ export const Builder = () => {
             </button>
           </div>
         </>
-      );
+      )
+      case 3: return(
+        <>
+          {JSON.stringify(content)}
+        </>
+      )
       
     }
   }
 
   return (
     <div className="w-full max-w-[1280px] m-auto">
-    <Navbar/>
+      <Navbar />
+      {loadIternary && (
+        <div className="w-full h-full fixed top-0 left-0 bg-amber-500 flex justify-center align-middle z-50 ">
+          <li className="flex items-center text-white text-xl font-semibold tracking-wide ">
+            <div role="status">
+              <svg
+                aria-hidden="true"
+                className="w-6 h-6 me-3 text-gray-200 animate-spin fill-blue-600"
+                viewBox="0 0 100 101"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                  fill="currentFill"
+                />
+              </svg>
+              <span className="sr-only">Loading...</span>
+            </div>
+            {loadIternary}
+          </li>
+        </div>
+      )}
       {renderStep()}
     </div>
   );
