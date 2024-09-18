@@ -64,7 +64,6 @@ export const Builder = () => {
       setLoadIternary("Generating AI planned Iternary");
       const prompt = `Generate a personalized travel itinerary for a trip to ${JSON.stringify(secondCity)} with a budget of ${budget} Rs. The traveler is interested in ${JSON.stringify(selectedTitles)}. They have the flight details ${JSON.stringify(flights.data.data)} and the accomadations is available at ${JSON.stringify(hotelPrice.data)}. Please provide a detailed itinerary with daily recommendations for ${duration} days, including these activities ${JSON.stringify(activity.data.data)} . The itinerary should be written in English. Give me the ouput in md format. Also give me the details of flights i should chose and the hotel we got the best deals from the gives list of flights and hotels.`;
       const content = await generateContent(prompt);
-      console.log(content.data.candidates[0].content.parts[0].text);
 
       // set content for visual
       setContent(content.data.candidates[0].content.parts[0].text)
@@ -278,7 +277,10 @@ export const Builder = () => {
                 Back
               </button>
               <button
-                onSubmit={findAirportCodes}
+                onClick={(e) => {
+                  e.preventDefault();
+                  findAirportCodes();
+                }}
                 className="px-7 py-4 text-xl text-center text-white bg-amber-500 rounded-xl shadow-2xl max-md:px-5"
               >
                 Submit
